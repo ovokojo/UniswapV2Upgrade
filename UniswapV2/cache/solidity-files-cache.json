@@ -146,8 +146,8 @@
       }
     },
     "src/UniswapV2Pair.sol": {
-      "lastModificationDate": 1681966725708,
-      "contentHash": "d362eeb545f3adc14c29d24da3038ae1",
+      "lastModificationDate": 1682206586361,
+      "contentHash": "94f6a5b29e7d7a504d41b57921585860",
       "sourceName": "src/UniswapV2Pair.sol",
       "solcConfig": {
         "settings": {
@@ -562,8 +562,8 @@
       }
     },
     "src/test/UniswapV2.t.sol": {
-      "lastModificationDate": 1681968187189,
-      "contentHash": "d377abae1c9c64002244504447e45e67",
+      "lastModificationDate": 1682209254990,
+      "contentHash": "8f809e997712b059014f1a08cf6bed1d",
       "sourceName": "src/test/UniswapV2.t.sol",
       "solcConfig": {
         "settings": {
@@ -610,8 +610,11 @@
       ],
       "versionRequirement": "=0.8.10",
       "artifacts": {
-        "UniswapV2FactoryTest": {
-          "0.8.10+commit.fc410830.Darwin.appleclang": "UniswapV2.t.sol/UniswapV2FactoryTest.json"
+        "MockCallee": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "UniswapV2.t.sol/MockCallee.json"
+        },
+        "TestUniswapV2Factory": {
+          "0.8.10+commit.fc410830.Darwin.appleclang": "UniswapV2.t.sol/TestUniswapV2Factory.json"
         },
         "UniswapV2PairTest": {
           "0.8.10+commit.fc410830.Darwin.appleclang": "UniswapV2.t.sol/UniswapV2PairTest.json"

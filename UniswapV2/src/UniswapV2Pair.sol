@@ -270,4 +270,11 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
             reserve1
         );
     }
+
+    function callMintFee(
+        uint112 _reserve0,
+        uint112 _reserve1
+    ) external returns (bool feeOn) {
+        return _mintFee(_reserve0, _reserve1);
+    }
 }
