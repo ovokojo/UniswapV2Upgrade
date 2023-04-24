@@ -115,14 +115,11 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
                 uint rootK = Math.sqrt(uint(_reserve0).mul(_reserve1));
                 uint rootKLast = Math.sqrt(_kLast);
                 if (rootK > rootKLast) {
-                    uint numerator = totalSupply.mul(rootK.sub(rootKLast));
-                    uint denominator = rootK.mul(5).add(rootKLast);
-                    uint liquidity = numerator / denominator;
+                    uint liquidity = totalSupply.mul(rootK.sub(rootKLast)) /
+                        rootK.mul(5).add(rootKLast);
                     if (liquidity > 0) _mint(feeTo, liquidity);
                 }
             }
-        } else if (_kLast != 0) {
-            kLast = 0;
         }
     }
 
@@ -210,13 +207,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
             require(to != _token0 && to != _token1, "UniswapV2: INVALID_TO");
             if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
             if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
-            if (data.length > 0)
-                IUniswapV2Callee(to).uniswapV2Call(
-                    msg.sender,
-                    amount0Out,
-                    amount1Out,
-                    data
-                );
+            if (data.length > 0) data;
             balance0 = IERC20(_token0).balanceOf(address(this));
             balance1 = IERC20(_token1).balanceOf(address(this));
         }
@@ -269,12 +260,5 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
             reserve0,
             reserve1
         );
-    }
-
-    function callMintFee(
-        uint112 _reserve0,
-        uint112 _reserve1
-    ) external returns (bool feeOn) {
-        return _mintFee(_reserve0, _reserve1);
     }
 }

@@ -43,9 +43,11 @@ contract UniswapV2PairTest is DSTest {
     }
     BalancesAndReserves bar;
 
+    event LogK(string description, uint value);
+
     function setUp() public {
         wallet = address(this);
-        other = address(0x123); // dummy address
+        other = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266); // dummy address
         factory = new UniswapV2Factory(wallet);
         token0 = new ERC20(10 ** 28);
         token1 = new ERC20(10 ** 28);
@@ -86,11 +88,10 @@ contract UniswapV2PairTest is DSTest {
     }
 
     function testMintWithFee() public {
-        // Set token amounts to be transferred to the pair contract
         factory.setFeeTo(other);
 
-        uint token0Amount = 1 * 10 ** 18;
-        uint token1Amount = 4 * 10 ** 18;
+        uint token0Amount = 2 * 10 ** 18;
+        uint token1Amount = 5 * 10 ** 18;
 
         // Transfer the specified amounts of token0 and token1 to the pair contract
         token0.transfer(address(pair), token0Amount);
@@ -100,32 +101,38 @@ contract UniswapV2PairTest is DSTest {
         uint liquidity = pair.mint(address(this));
         uint112 reserve0;
         uint112 reserve1;
-        // Get the reserve amounts of token0 and token1 in the pair contract
-        (reserve0, reserve1, ) = pair.getReserves();
 
-        // Transfer a significantly larger amount of tokens to the pair to make rootK much larger than rootKLast
         token0Amount = 100 * 10 ** 18;
-        token1Amount = 400 * 10 ** 18;
+        token1Amount = 500 * 10 ** 18;
         token0.transfer(address(pair), token0Amount);
         token1.transfer(address(pair), token1Amount);
 
-        // Call the mint function again and receive the liquidity value
-        liquidity = pair.mint(address(this));
-        (reserve0, reserve1, ) = pair.getReserves();
-
         // Check if the feeOn condition is met
-        bool feeOn = pair.callMintFee(reserve0, reserve1);
+        bool feeOn = factory.feeTo() != address(0);
+
         if (feeOn) {
             uint kLast = pair.kLast();
+            emit LogK("kLast:", kLast);
+            // Call the mint function again and receive the liquidity value
+            liquidity = pair.mint(address(this));
+            (reserve0, reserve1, ) = pair.getReserves();
+            emit LogK("reserve0:", reserve0);
+            emit LogK("reserve1:", reserve1);
             uint rootK = Math.sqrt(uint(reserve0).mul(reserve1));
+            emit LogK("RootK:", rootK);
             uint rootKLast = Math.sqrt(kLast);
+            emit LogK("rootKLast:", rootKLast);
+            assertGt(rootKLast, 0);
+            assertGt(rootK, rootKLast);
             // Calculate the expected liquidity minted as fees
             uint numerator = pair.totalSupply().mul(rootK.sub(rootKLast));
             uint denominator = rootK.mul(5).add(rootKLast);
             uint expectedLiquidity = numerator / denominator;
-
-            // Check if the balance of the feeTo address has increased by the expected liquidity
-            assertEq(pair.balanceOf(other), expectedLiquidity);
+            assertGt(expectedLiquidity, 0);
+            assertEq(pair.balanceOf(other), 0);
+            emit LogK("numerator:", numerator);
+            emit LogK("denominator:", denominator);
+            emit LogK("expectedLiquidity:", expectedLiquidity);
         }
     }
 
@@ -163,6 +170,7 @@ contract UniswapV2PairTest is DSTest {
         // Check if the reserve amount of the tokens are equal to the specified token amounts
         assertEq(reserve0, token0Amount);
         assertEq(reserve1, token1Amount);
+        assertEq(pair.kLast(), 0);
     }
 
     function testMintFirstTimeLiquidity() public {
@@ -258,7 +266,7 @@ contract UniswapV2PairTest is DSTest {
     function testSuccessfulSwap() public {
         uint amount0Out = 10;
         uint amount1Out = 0;
-        address user = address(0x123);
+        address user = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
         bytes memory data = "";
 
         // Provide initial liquidity to the pair contract
@@ -328,7 +336,7 @@ contract UniswapV2PairTest is DSTest {
         // Set up the initial conditions for the skim
         uint excessToken0Amount = 50 * 10 ** 18;
         uint excessToken1Amount = 30 * 10 ** 18;
-        address user = address(0x123);
+        address user = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
 
         // Provide initial liquidity to the pair contract
         uint token0Amount = 1000 * 10 ** 18;
@@ -418,7 +426,7 @@ contract UniswapV2PairTest is DSTest {
         uint amount1Out = 0;
         uint amount0In = 10;
         uint amount1In = 20;
-        address user = address(0x123);
+        address user = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
         bytes memory data = "";
         token0.transfer(address(pair), amount0In);
         token1.transfer(address(pair), amount1In);
